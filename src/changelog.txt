@@ -113,3 +113,5 @@
         dalsie testy -> dalsie opravy, problem pri wrapperProcessore
         prerobenie logiky generovania informacii z anotacii a vlastnosti, teraz sa cela zodpovednost aj v tychto pripadoch kladie na InformationExtractor
         prerobene niektore rozhrania, napr. fasada ConfigurationGatherer, umoznujuca zadat explicitne URL na skenovanie (kvoli pohodlnemu pouzitiu vo webe)
+24-07-2012
+        par oprav kvoli spustaniu v anotacnom procesore - ide v principe o riesenie problemov s ClassLoaderom, pridal som tam podmienene volania s inym classloaderom v pripade zlyhania
