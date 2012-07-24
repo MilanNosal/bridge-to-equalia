@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://kpi.fei.tuke.sk/Nosal/Milan/BTE/metaconfiguration" elementFormDefault="qualified" targetNamespace="http://kpi.fei.tuke.sk/Nosal/Milan/BTE/metaconfiguration">
+   <xsd:element name="metaconfiguration" type="metaconfiguration-type"/>
+   
+   <xsd:complexType name="metaconfiguration-type">
+      <xsd:sequence>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="BTEConfiguration" type="BTEConfiguration-type"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="BTEConfiguration-type">
+      <xsd:sequence>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="configurationAnnotations" type="xsd:string"/>
+         <xsd:element maxOccurs="1" minOccurs="1" name="document" type="document-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="inputDocuments" type="inputDocuments-type"/>
+         <xsd:element default="" maxOccurs="1" minOccurs="1" name="jaxbPackage" type="xsd:string"/>
+         <xsd:element default="" maxOccurs="1" minOccurs="1" name="outputDirectory" type="xsd:string"/>
+         <xsd:element default="document.xml" maxOccurs="1" minOccurs="1" name="outputDocument" type="xsd:string"/>
+         <xsd:element default="XML" maxOccurs="1" minOccurs="1" name="priority" type="priority-type"/>
+         <xsd:element default="document.xsd" maxOccurs="1" minOccurs="1" name="schemaLocation" type="xsd:string"/>
+         <xsd:element default="false" maxOccurs="1" minOccurs="1" name="warningPrinting" type="xsd:boolean"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="annotationType" type="annotationType-type"/>
+      </xsd:sequence>
+      <xsd:attribute name="key" type="xsd:string"/>
+   </xsd:complexType>
+   <xsd:complexType name="document-type">
+      <xsd:sequence>
+         <xsd:element maxOccurs="1" minOccurs="1" name="XMLNameSpace" type="xsd:string"/>
+         <xsd:element maxOccurs="1" minOccurs="1" name="elementKinds" type="elementKinds-type"/>
+         <xsd:element maxOccurs="1" minOccurs="1" name="rootName" type="xsd:string"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="elementKinds-type">
+      <xsd:sequence>
+         <xsd:element default="annotation" maxOccurs="1" minOccurs="1" name="_annotationType" type="xsd:string"/>
+         <xsd:element default="class" maxOccurs="1" minOccurs="1" name="_class" type="xsd:string"/>
+         <xsd:element default="constructor" maxOccurs="1" minOccurs="1" name="_constructor" type="xsd:string"/>
+         <xsd:element default="enum" maxOccurs="1" minOccurs="1" name="_enum" type="xsd:string"/>
+         <xsd:element default="field" maxOccurs="1" minOccurs="1" name="_field" type="xsd:string"/>
+         <xsd:element default="interface" maxOccurs="1" minOccurs="1" name="_interface" type="xsd:string"/>
+         <xsd:element default="method" maxOccurs="1" minOccurs="1" name="_method" type="xsd:string"/>
+         <xsd:element default="package" maxOccurs="1" minOccurs="1" name="_package" type="xsd:string"/>
+         <xsd:element default="parameter" maxOccurs="1" minOccurs="1" name="_parameter" type="xsd:string"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="inputDocuments-type">
+      <xsd:sequence>
+         <xsd:element maxOccurs="1" minOccurs="1" name="location" type="xsd:string"/>
+         <xsd:element default="true" maxOccurs="1" minOccurs="1" name="resource" type="xsd:boolean"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:simpleType name="priority-type">
+      <xsd:restriction base="xsd:string">
+         <xsd:enumeration value="XML"/>
+         <xsd:enumeration value="ANNOTATIONS"/>
+      </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:complexType name="annotationType-type">
+      <xsd:sequence>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="skip" type="skip-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="inside" type="inside-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="wrapper" type="wrapper-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="mapsTo" type="mapsTo-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="targetElement" type="targetElement-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="staticModifier" type="staticModifier-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="copyBranch" type="copyBranch-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="declMethod" type="declMethod-type"/>
+      </xsd:sequence>
+      <xsd:attribute name="annotation" type="xsd:string"/>
+   </xsd:complexType>
+   <xsd:complexType name="skip-type">
+      <xsd:sequence>
+         <xsd:element default="2147483647" maxOccurs="1" minOccurs="1" name="depth" type="xsd:int"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="inside-type">
+      <xsd:sequence>
+         <xsd:element default="SAME_LOWER" maxOccurs="1" minOccurs="1" name="level" type="level-type"/>
+         <xsd:element maxOccurs="1" minOccurs="1" name="parent" type="xsd:string"/>
+         <xsd:element default="false" maxOccurs="1" minOccurs="1" name="processed" type="xsd:boolean"/>
+         <xsd:element default="false" maxOccurs="1" minOccurs="1" name="setMergingPoint" type="xsd:boolean"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:simpleType name="level-type">
+      <xsd:restriction base="xsd:string">
+         <xsd:enumeration value="SAME"/>
+         <xsd:enumeration value="LOWER"/>
+         <xsd:enumeration value="HIGHER"/>
+         <xsd:enumeration value="SAME_LOWER"/>
+         <xsd:enumeration value="SAME_HIGHER"/>
+      </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:complexType name="wrapper-type">
+      <xsd:sequence>
+         <xsd:element default="true" maxOccurs="1" minOccurs="1" name="childWrapping" type="xsd:boolean"/>
+         <xsd:element default="PACKAGE" maxOccurs="1" minOccurs="1" name="targetCoupling" type="targetCoupling-type"/>
+         <xsd:element default="${name}-type" maxOccurs="1" minOccurs="1" name="typeName" type="xsd:string"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="wrappedElements" type="xsd:string"/>
+         <xsd:element maxOccurs="1" minOccurs="1" name="wrapperName" type="xsd:string"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:simpleType name="targetCoupling-type">
+      <xsd:restriction base="xsd:string">
+         <xsd:enumeration value="PACKAGE"/>
+         <xsd:enumeration value="TOP_PACKAGE"/>
+         <xsd:enumeration value="CLASS"/>
+         <xsd:enumeration value="TOP_CLASS"/>
+         <xsd:enumeration value="TARGET"/>
+         <xsd:enumeration value="TOP_TARGET"/>
+         <xsd:enumeration value="ONE"/>
+         <xsd:enumeration value="PER_CHILD"/>
+      </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:complexType name="mapsTo-type">
+      <xsd:sequence>
+         <xsd:element maxOccurs="1" minOccurs="1" name="name" type="xsd:string"/>
+         <xsd:element default="${name}-type" maxOccurs="1" minOccurs="1" name="typeName" type="xsd:string"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="targetElement-type">
+      <xsd:sequence>
+         <xsd:element default="false" maxOccurs="1" minOccurs="1" name="element" type="xsd:boolean"/>
+         <xsd:element default="false" maxOccurs="1" minOccurs="1" name="generic" type="xsd:boolean"/>
+         <xsd:element maxOccurs="1" minOccurs="1" name="name" type="xsd:string"/>
+         <xsd:element default="CONTEXT" maxOccurs="1" minOccurs="1" name="printType" type="printType-type"/>
+         <xsd:element default="" maxOccurs="1" minOccurs="1" name="targetConfiguration" type="xsd:string"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:simpleType name="printType-type">
+      <xsd:restriction base="xsd:string">
+         <xsd:enumeration value="FULL"/>
+         <xsd:enumeration value="CONTEXT"/>
+         <xsd:enumeration value="SIMPLE"/>
+         <xsd:enumeration value="NO_PRINT"/>
+      </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:complexType name="staticModifier-type">
+      <xsd:sequence>
+         <xsd:element default="true" maxOccurs="1" minOccurs="1" name="element" type="xsd:boolean"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="copyBranch-type">
+      <xsd:sequence>
+         <xsd:element maxOccurs="1" minOccurs="1" name="copysParent" type="xsd:string"/>
+      </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="declMethod-type">
+      <xsd:sequence>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="attribute" type="attribute-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="skip" type="skip-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="inside" type="inside-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="wrapper" type="wrapper-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="mapsTo" type="mapsTo-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="targetElement" type="targetElement-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="staticModifier" type="staticModifier-type"/>
+         <xsd:element maxOccurs="unbounded" minOccurs="0" name="copyBranch" type="copyBranch-type"/>
+      </xsd:sequence>
+      <xsd:attribute name="method" type="xsd:string"/>
+   </xsd:complexType>
+   <xsd:complexType name="attribute-type"/>
+</xsd:schema>

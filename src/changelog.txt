@@ -1,0 +1,115 @@
+13-8-2010
+	XMLModelParser.mergeInformationPerChild() - spajanie informacii ktore su per_child do jednej informacie, potrebne pre neskorsie merge
+	findChildrenToProcess() - presunul som do Configuration rozhrania, uz nie je v Utilities
+        enum GeneratingCharacter - rozsiril som o PER_CLASS, PER_PACKAGE a PER_ELEMENT
+        ModelParsingUtilities.generateWrappers() - zacinam
+15-8-2010
+        ModelParsingUtilities.areThereWrappers(), isItWrapper()
+        ModelParsingUtilities.populateWrappers() - na upravu celeho modelu
+        ModelParsingUtilities.generateWrappers() - na generovanie jedneho bunch-u wrapperov
+        ModelParsingUtilities.findEnclosingClass(),findEnclosingPackage() - najdenie uzatvarajuceho prvku
+16-8-2010
+        oprava parsovania - zabudal som nastavovat rodicov, takmer vsade! - pouzivat setParent
+19-8-2010
+        nova trieda, WrapperHandler - rozdelenie funkcionality z ModelParsingUtilities
+20-8-2010
+        rozsirovanie a dokoncovanie funkcionality WrapperHandler
+        cekol som aj tu "optimalizaciu", niet tam moc co zlepsovat
+23-8-2010
+        XSDMerger premenovany na XSDCreator a presunuty do balika A2XandM.tool.translation.metamodel.translator
+        dokonceny ModelMerger
+24-8-2010
+        reworking XMLTranslator
+        odstranil som XSDCreator ako nadbytocny, jeho funkcionalitu prebera XSDTranslator
+        ModelMerger som rozsiril o generovanie informacii podla poctu nasledovnikov (pre informacie typu PER_CHILD)
+        XMLModelParser som rozsiril o citanie z xml dokumentu
+        dost podstatne zmeny v strukture balikov
+        optimalizoval som ModelMerger
+        oprava ModelParser.getSourceValueForDeclaredMethod()
+25-8-2010
+        testy a opravy, drobne opravy v modelMerger.mergeInformation() a XMLModelParser.getChildrenByTypes()
+        v InformationImpl som odtranil z equals pouzitie sourceValue, je sice podstatne, avsak nemam ho
+        definovane v XML model..
+        zmena MetaConfiguration, povedal som si ze staci mapa<String, String> pre properties
+        este iste upravy v ModelMerger.mergeInformation(), mozu sposobit zaujimave spravanie sa v pripade, ze xml nezodpoveda MM(pricom to nemusi padnut)
+        pridany AttributeProcessor, namiesto uvazovanych visitorov pouzijem akesi procesory, budu fungovat obdobne, ale budu moct
+        pracovat nad celym MM
+26-8-2010
+        SkipProcessor
+        pridanie InformationExtractor do MM, pomocou neho mozem nechat na pouzivatelovi tahanie informacii(dufam ze mi to umozni do XML generovat aj veci z kodov-static, a pod)
+        adaptovanie ModelMerger-a na pouzitie InformationExtractor
+        pridal som clone() do Configuration i COnfigurationImpl
+        paru zmien v ModelParsingUtilities, niektore rekurzie som spravil iterativne
+27-8-2010
+        InsideProcessor
+28-8-2010
+        zacal som wrapperProcessor
+29-8-2010
+        WrapperProcessor
+        oprava WrapperHandler, metody generateWrappersPerClass(), generateWrappersPerPackage(), generateWrappersPerTarget()
+        zmena parserov, nova trieda PerChildHandler, oba parsery poskytuju modely s nagenerovanymi perchild wrappermi,
+        ModelMerger teraz spoji per_child wrappre pred mergovanim a po procese ich znova napopuluje
+        TargetElementProcessor, MapsToProcessor, upravy v XSDTranslator, opravy v ModelParsingUtilities.buildUpTargetElement
+        StaticModifierProcessor - pouzitie rozhrania InformationExtractor
+3-9-2010
+        upravy v TargetElementProcessor
+5-9-2010
+        rozsirenie o InformationComparator rozhranie, umoznujuce definovat, ako sa maju porovnavat informacie na ekvivalenciu
+9-10-2010
+        zmena mena projektu
+        pridanie proxy mechanizmu na mapovanie properties (zatial nevyuzite..)
+        pridany test na riadku 87 scannotationScanner, test ci je vobec nejaky vyskyt danej anotacie, inak to padalo
+        zmena xsdTranslator, iba raz pridava typ elementu/atributu s danym menom (menom typu)
+15-10-2010
+        uprava rozhrania MetaConfigurationLoader, ako vstup xml a vystup berie Stream, aby sa abstrahoval vstup cez getResource() a zo suborov
+        upravy vsetkych ovplyvnenych tried, prerobeny zapis do suboru
+19-10-2010
+        prekopal som niekolko pristupov XML a XSD Translatorov k vystupu
+        pridal som triedy Multi-parser a merger, jemne upravil vstupy xmlmodelparseru a model merger
+        pridanie do ConfigurationSource supportedElements a supportedPrefix, plus implementacia spracovania
+20-10-2010
+        pokracovanie na procesore pre rekuzivnu instanciu
+21-10-2010
+        praca na vytvoreni rekurzie, vygenerovanie xsd a tried
+        drobna oprava pri citani predvolenej hodnoty u poli
+2-11-2010
+        odstranil som to proxy (pack propertiesbounding)
+        pridanie polozky jaxbPackage do metaconfigurationloader
+        pozmenenie BTEConfiguration (pridane niektore veci)
+        presunuty RecursProcessor a prementovany na Meta
+        prekopane spracovanie metakonfiguracie
+        MMConfigurationLoader
+        oprava scannotationscannera
+        zmena metakonfiguracie na objekty
+3-11-2010
+        oprava v modelParsingUtilities.filterAnnotations
+        rozsirenie filtrovania anotacii aj o vynimky
+4-11-2010
+        prerobil som AnnotationInstance tak, aby pri package ukladalo package a nie triedu z package-info.java
+        prekopavaie WrapperHandlera tak, aby dokazal pridavat k vygenerovanym wrapperom aj annotationInstance
+8-11-2010
+        BTEMetaConfigurationLoader - MetaConfigurationLoader nacitavajuci konfiguraciu aj z xml aj z anotacii
+9-11-2010
+        prerobil som vsetky procesory na prijatie noveho typu metakonfiguracie <- z BTEMetaconfigurationLoader
+        ConfigurationGatherer - hlavne rozhranie pouzitia nastroja
+        uprava MMParsera, pri default hodnote dekl. vlastnosti nastavi volitelnost uvedenia elementu / atributu - oprava log. chyby
+        MMParser - detegovanie nepodporovanych return typov, drobna chyba pri array of primitives (porovnaval som zly objekt)
+        odstranil som output do suboru iba podla Stringu, aby som sa nemusel babrat s cestou
+14-11-2010
+        zmenil som Document.createElement na Document.createElementNS, teraz bezi aj jaxb priamo z Document (nasadil som aj XMLConstants)
+        upravil som MMParser, aby spracovaval deklarovanie vlastnosti podla abecedy (nejako blblo implicitne poradie)
+22-12-2010
+        nejake opravy, asi som nepochopil default v XSD
+        zmena, je povinny element aj pri default (zmena v MMParser), len nemusi mat hodnotu, avsak pri atribute ostava optional (XSDTranslator)
+28-12-2010
+        bug, ak davam pri annotation scanner set z tabulky, musim si dat pozor, aby sa nezmenil
+30-12-2010
+        prerobenie viacerych veci z mm, plus prerobenie wrapperov
+18-01-2011
+        celkom prepracovany projekt, najma komentare a zopar funkcionalit, plus ciastocna optimalizacia
+19-01-2011
+        testy, zopar oprav
+08-02-2011
+        dalsie testy -> dalsie opravy, problem pri wrapperProcessore
+        prerobenie logiky generovania informacii z anotacii a vlastnosti, teraz sa cela zodpovednost aj v tychto pripadoch kladie na InformationExtractor
+        prerobene niektore rozhrania, napr. fasada ConfigurationGatherer, umoznujuca zadat explicitne URL na skenovanie (kvoli pohodlnemu pouzitiu vo webe)

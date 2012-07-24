@@ -1,0 +1,307 @@
+class.getCanonicalName vs. class.getName
+canonical - lepsie vyzera, pri vnutornej triede to ide cez bodku
+name - pri vnutornej triede ide cez dolar, ide to vsak instanciovat
+
+scannotation - urobit discovery, ze pre vsetky vyskyty anotacii mi vratia jeden zoznam tried?
+             - priamo v mojom kode zobrat z discovery zoznam, ale skumat uz len tie, v ktorych mi
+               pritomnost anotacii potvrdi scannotation
+             - discovery, ze zmenim rozhranie, bude vraciat jeden zoznam pre jednu anotaciu(ako riesit neopakovanie sa)
+             - nieco dalsie???
+
+package vyzera ze pojde tiez.. dava sa na triedu package-info..
+
+class.forname - tak aby sa staticky neinicializovalo
+
+zda sa ze aj ked Scannotation dostane dva URL na rovnake subory, spracuje ich len raz,
+tj. vysledok sa nezmeni, preto myslim ze mozem prehladavat .jar subory do hlbky akej chcem
+urobim vsak asi aj konfigurak, kde sa bude dat povedat URL ktore prehladavat
+
+new URL(cp.getProtocol(), cp.getHost(), cp.getPort(), cp.getFile()) --
+    >> file; ; -1; /C:/Documents and Settings/Milan/My Documents/NetBeansProjects/ScannotationTest/src/
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+upravit warningprinter, nemal by byt singleton, lebo nebudem vediet v jednom projekte
+vypnut warnings, a v druhom nechat zapnute
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+pridat k target aj enumConstant? je to zistitelne... zatial to ponecham ako field enumu..
+
+pouzivam getDeclaredAnnotations - neberie aj zdedene.. predpokladam ze tie ma nezaujimaju.. je to tak ale aj naozaj?
+pouzijem asi len getAnnotations, a budem brat aj zdedene.. zda sa mi ze tak to bude lepsie
+dedenie vraj nejde
+
+ako ukladat instancie anotacii? zatial davam ako objekt java.lang.annotation.Annotation, avsak
+tam sa moze dost komplikovane citat jednotlive polozky, pouvazovat o nejakom wrappri.
+
+ako zabezpecit rozsiritelnost? uvazoval som o nejakom rozhrani aj pri ziskavani informacii,
+momentalne ziskava iba z AnnotationInstance.. ak by chcel tak by mohol napr. ziskat aj info
+z kodu, tj napr ci je metoda staticka a pod. pricom to ako ziska potrebnu informaciu, by
+si definoval programator pomocou nejakeho vlastneho kodu, ktory by splnal nejake moje rozhranie
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! http://fusionsoft-online.com/articles-java-annotations.php                   !
+! dedenie anotacii                                                             !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+pouzivat getDeclaredMethods pri prehladavani
+
+lokalne a anonymne triedy vynechavam, pretoze tie neviem jednoznacne identifikovat z kodu
+pomocou reflexie
+
+!!!!
+pri clenskych vnutornych triedach musim pouvazovat ako narabat s konstruktormi,
+totiz preberaju aj odkaz na Uzatvarajucu triedu, pricom v kode nie je explicitne
+zapisany -
+    anntest.Trieda$Trieda2(anntest.Trieda,int)  z  public Trieda2(int o)
+
+                                        MENA:
+package:
+    String javaElementName = clazz.getPackage().getName();
+field:
+    String javaElementName = clazz.getName()+"."+field.getName();
+metoda + konstruktor:
+    String javaElementName = getMethodsCanonicalName(method.toGenericString(), method.getName());
+    /**
+     * Jednoducha metoda, ktora z generickeho popisu metody (metoda toGenericString())
+     * ziska cely nazov metody (vratane zoznamu parametrov) a teda vlastne
+     * jedinecny popis metody.
+     * @param methodGenericName
+     * @param methodName
+     * @return
+     */
+    private String getMethodsCanonicalName(String methodGenericName, String methodName){
+        StringTokenizer st = new StringTokenizer(methodGenericName, " ");
+        while(st.hasMoreTokens()){
+            String token = st.nextToken();
+            if(token.contains(methodName)){
+                return token;
+            }
+        }
+        return methodName;
+    }
+parameter:
+    javaElementName = methodName + "." + i;
+
+nesupnut aj annotationScanner do metaconfigurationLoadra?
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+doriesit ako je to s default.. ci doplnat do doku to co je v scheme ako default..
+zalezi to asi podla toho ako to robia samotne parsery..
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+pozor na orezavanie mien s lastIndexOf("."), pretoze pri package.Trieda.metoda(java.lang.String)
+
+pozor, nie kazda Inforamtion moze mat AnnotationInstance, a teda aj targetElementName
+
+uvedomit si rozdiel medzi skutocnym a tzv. xml kontextom v zmysle kontextu
+java elementu(target). ja mozem vediet v modele, ze dana informacia je v kontexte
+metody, avsak ak som doteraz nevytlacil ziadnu informaciu o kontexte, z pohladu
+XML sa da hovorit iba o globalnom, tzv projektovom kontexte(alebo suborovom)
+
+podobne treba pamätat na to ze moze byt pouzite SKIP aj nad configuration, ktora
+je nejakej dalsej ako anchor. asi to budem riesit tak, ze aj tie co su skip, aj pre tie
+budem generovat Information, len sa potom uz nevytlaci
+
+rozsirenie:   neviem zabezpecit nieco taketo:
+        <bla>
+            <ukulele>1</ukulele>
+        </bla>
+        <bla>
+            <ukulele>2</ukulele>
+        </bla>
+        <bla>
+            <ukulele>3</ukulele>
+        </bla>
+kde je vlastne bla nejaky pouzivatelom pridany element(nie je generovany z anotacii),
+viem momentalne iba:
+        <bla>
+            <ukulele>1</ukulele>
+            <ukulele>2</ukulele>
+            <ukulele>3</ukulele>
+        </bla>
+staci alebo nie???????? ak nie ako na to????? vyjadrit v MM by nemal byt problem,
+ale pri mojom style parsovania ako to zabezecit? ked robim rodica, este neviem
+kolko bude mat deti.. ibazeby som sa o to postaral pri preklade. tj ze ponecham len
+jedno, ale bude nastavenie, ktore mi pri preklade sa pozrie a zisti, ze chcem ten
+element mat tolko krat kolko ma deti a vygenerujem tolko elementov. nie zly napad
+
+uvazujem o tom ci by sa nedalo nejak poriesit to, aby nemusel davat skip nad
+annotation, ak tam chce napr iba jej declaredMethod. teraz tam musi mat aj
+annotation, a zaroven nad nu dat SKIP. azda by sa to dalo obist, ak by som nesiel
+cez anchor ako decl.method ale tahal priamo z annotacneho typu, ktory je dodany.
+skusim to spravit - prilis zlozite prerabat, maly zisk za privelku cenu
+
+
+nezabudnut pri preklade modelu, treba dbat na poradie.. skip mi ho moze narusit..
+napr ak dam preskocit element pre anotaciu, tak mi bude vypisovat priamo metody prvej anotacie, potom
+metody dalsej anotacie, atd.. a ja potrebujem, aby mi vypisalo vsetky hodnoty
+prvej metody daneho anotacneho typu, potom vsetky hodnoty anotacii druhej metody anot. typu atd.
+
+teraz preklad, riesenie identifikacii, a poriesenie skipovania
+
+merge >>
+    ako na to? ak mam napr Table v anotaciach s 3 columnami, a v XML mam stejny
+    Table so 4 columns a priorita je na anotaciach. povedzme ze aj table ma nieco
+    rozdielne. Mam menit iba to co priamo zavisi od anotacie pre Table, tj len
+    tie elementy a atributy co su generovane z deklarovanych metod, alebo vlastne
+    cely obsah Table, tj napr aj tie elementy co su generovane z tzv. Inside
+    anotacii? lebo v prvom pripade dodam iba 3 columny z anotacii, v druhom este
+    aj 4. column, ktory je "doplneny" z xml.. popr. nejak selektivne?? pridat
+    nieco do kofiguracie o tom ci sa ma dana informacia detekovat na identifikaciu
+    a nahradzat.. to by mohla byt efektivna cesta bez dalsej konfiguracie.. by sa to
+    prenieslo na "visitorov".. skusim to asi tak, len premysliet ako to bude fungovat
+momentalne som to spravil na nejakey merging point, podla ktoreho sa testuje
+identita a spaja. Nahradza sa vsetko, okrem pripadu, ze v podstrome konfiguracie
+je nastaveny dalsi merging point. vtedy sa nahradi vsetko, okrem informacii,
+ktore maju byt znova spajane(merging point). Zatial povolim merging point iba
+na konfiguracii z anotacie(nie vlastnych ani dekl metod). Tym dosiahnem to hlavne.
+
+
+                            MERGING
+
+<pr>
+    <table>
+        <name>tab1</name>
+        <column>
+            <name>meno</name>
+            <field>name</field>
+        </column>
+        <column>
+            <name>priezvisko</name>
+            <field>lastname</field>
+        </column>
+        <column>
+            <name>vyska</name>
+            <field>height</field>
+        </column>
+    </table>
+    <table>
+        <name>tab2</name>
+        <column>
+            <name>firma</name>
+            <field>firm</field>
+        </column>
+        <column>
+            <name>software</name>
+            <field>soft</field>
+        </column>
+    </table>
+</pr>
+
+parsujem uz aj xml do svojho modelu, aby som sa vyhol neurcitosti, odporucam
+nepouzivat mena z mnoziny moznych pre target element pre rovnaky typ zobrazenia,
+tj ak target element je vyjadreny ako atribut s nazvom class, odporucam nepouzivat
+dalsie atributy s nazvami ako annotation_type a pod., ak tam potrebujem nejaku taku hodnotu,
+radsej pouzit element, alebo sa tomu nejak vyhnut, inak budem mat problemy pri
+hladani targetElementu. pri SIMPLE type vypisu target je potom rekonstrukcia
+target elementu velmi priblizna
+!!!!!!!! POZOR, ak je context tlac, a kontext je rovnaky ako aktualny target, tak
+!!!!!!!! target element neuvadzam
+
+pridavam tie wrappre.. ale po pridani targetElement nad wrapprom musim prejst jeho deti a
+pripadne upravit ich targetElementy.. kvoli context vypisu
+    - mozno keby som vobec negeneroval targety na zaciatku, ale az nakoniec
++ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! pokusit sa o nejaku optimalizaciu.. neviem teraz ako to robim, ale napr ak testujem
+na nieco deti informacie, je vhodnejsie prejst len mozno keyset, alebo getChildrenToPRocess,
+a testovat ich iba raz, ako testovat ich pri kazdej informacii (napr test ci mam pokracovat
+v generovani niecoho)
+
+wrappers - ak mam napriklad cok.pop a cok.lol, negeneruje mi to jeden pod cok.. no neviem..
+mozno by to slo poriesit nejaky porovnavanim podretazcov, pri package by to nebol problem,
+avsak pri triede by mohol byt.. nehovoriac o target..
+
+teraz by mali byt ekvivalentne modely z XML aj z anotacii.
+
+mohol by som povuazoat aj o Inside nad dekl. vlastnostami. teraz mozem dat anotaciu do anotacie
+teraz som svojim MM obmedzeny v tomto smere - ukazalo sa ze by som to teoreticky mal dokazat klonovanim configuracii, proste
+prenesiem nielen dek. met. ale celu anotaciu a nastavim ju na skip
+
+!!!!!!!!    toto by bolo viac nez vhodne
+prerobit metaconfiguration na mapu string object, namiesto string string?
+
+mozno pripustit nielen tahanie informacii do obsahu elemntu/atributu, ale aj
+za nazvy(zatial to robi len targetElement) - to sa tazko spravi, pretoze aby som mohol identifikovat nazov
+v scheme, potrebujem ho vediet uz pri MM, a tahat mozem z kodov az pri parsovani modelu..
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ako nacitavat xmlka, cez classloader.resource alebo cestou?
+
+pouvazovat o spajani s xml, ktore uplne nezodpoveda MM.. proste MM popisuje iba
+podcast xml jazyka, zvysok by sa ponechal z dodaneho xml. PROBLEM - ako dodrzat sekvenciu?
+ak napr pre 1. element v sekvencii by sm nemal ekv. v anotaciach a pre posledny tiez,
+po extrahovani modelu XMLParserom by mi ostal Element s 1. a poslednym elementom,
+a nejakymi podInformaciami. Ako by som vedel ako zoradit informacie spolu s
+elementmi? MM pouzit nemozem, ostava jedine schema.. a skumat schemu, ako som videl pri
+http://java.sun.com/xml/ns/javaee tak to moze byt velmi neprijemna a zlozita uloha
+
+vazna otazka, uvazovat o pozmeneni generovania schemy? pouzivat finty ako group, choice a pod. namiesto
+staleho sequence? bolo by to mozno plastickejsie riesenie, ako by to vsak ovplyvnilo napr nasledne
+parsovanie XML dokumentu? teraz vyuzivam aj sekvenciu pri odhadovani typu elementu, ktory chcem spracovat v informaciu
+azda by to slo, ale vela roboty by s tym bolo tak to zatial necham tak
+
+ako poriesit tie nacitavania xml a metakonfiguracie.. mozno zmenit v rozhrani na File,
+aby som potom pre metakonfiguraciu vedel xml citat cez getResource, namiesto klasickeho vytvarania
+cesty.. alebo pridat aj nejaky boolean, ktory povie ci mam ist cez getResource?
+props.load(getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE)); - momentalne nacitavanie pre scannotationscanner
+PRECO?
+LEBO:   xml ktore je metaconfiguraciou, je vystupom(vstupom) metainstancie A2X7M, tj
+        instancia, ktra nacitava metakonfiguraciu, pracuje s xml, ktore budem pravdepodobne
+        chciet vlozit do classpath, cez getResource, avsak naopak, vrchna instancia
+        nastroja bude chciet mat moznost pracovat nielen s getResource, ale aj
+        so subormi na nejakej konkretnej ceste
+
+ako sa napokon postavit k pouzitiu JAXB? v prvom momente mi cast automatizovatelna
+antom pride nie moc efetivna, zisk je naozaj maly.. v podstate automatizujem
+2 prikazy (v NB prostredi iba jeden, kedze kompilaciu zriesi IDE)
+
+ako poriesit ten problem s jaxb, pri ktorom mi nechce unmarshallnut prave vygenerovane xml?
+
+jmp NEAR 53
+
+call studie.txt
+
+annotationscanner ..  ci staci jeho rpsitup
+
+ak pouzijem napr wrapper annotatciu, ako Configs pre Config, a oba su urcene na spracovanie,
+vznikne drobny problem, kedze sa spracuva aj config aj configs, vlozi mi typy pre config, ale nasledne
+aj pre configs, ktory ma pouzitie config, teda sa mi vyskytnu dvakrat definicie typov pre vsetko
+co je pod config -> kolizia typov; potrebujem to nejako poriesit, momentalne ma napada nejako
+sledovat zdroj typu (stacil by nazov?) a pridavat len tie typy, ktore sa este nevyskytli
+
+ako poriesit odkazy na schemu, ak su napr v jar, malo by stacit
+
+????????????????????????????????????????????????????????????????????????????????????????????????????????
+ako s Class? ma zmysel aby som to daval do anotacii, avsak neviem ako to dat do xml..
+
+dalo by sa lepsim navrhom AnnotationScanner rozhrania zjednodusit mozno niektore veci..
+taky filtering anotacii si myslim by sa dal jednoznacne zlepsit
+
+momentalne wrapperhadler ma dost narocne generovanie (kvoli pridavaniu AnnotationInstance),
+kvoli tomu ak spajam a potom rozpajam, moze to byt narocne
+
+treba si uvedomit ze procesory su implementovane tak, ze su zavisle na vstupe
+(uz tam nie je nejaka zaobalujuca trieda) -> mozno by stalo za uvahu premyslat
+o navrate k wrapperom..
+
+s tym ako je teraz riesena metakonfiguracna anotacia BTEConfiguration, ju musim vzdy
+pouzit. zmena?
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Okej, takze znova:
+ako riesit vlastnosti a default? pretoze napr servlet (a prav. aj vacsina dalsich
+technologii) to berie tak, ze ak je priradena predvolena hodnota v anotaciach,
+tak v xml je to volitelne, tj nemusi sa to uviest. pri pouziti default hodnoty
+sa to pekne namapuje pri nepouziti atributu, avsak aby sa to mapovalo pri elementoch,
+treba uviest prazdny element - teraz to je riesene takto, informacia sa stale
+musi uviest, ak je prazdny element pouzije sa default hodnota (ak ovsem je)
+- z toho vyplyva aj generovanie prazdnych elementov pri prazdnom retazci napr. (mozno neviem co hovorim pri tejto vete)
+
+
+dalsia vec je pouzitie sekvnecie. mne sa sice lahsie potom rozlisuju typy pri
+spracovani xml, avsak dost debilne sa pisu dokumenty v praxi
+
+POUZITIE VSEOBECNE KONFIGURACIE VS. NA MIERU SITY PROCESOR (ako napr. metaprocesor)
