@@ -65,6 +65,22 @@ public class ConfigurationGatherer {
         this.annotationScanner = new ScannotationScanner(annotations, metaConfigurationLoader.getWarningPrinter());
         initialize();
     }
+    
+    /**
+     * Konstruktor. Parameter key predstavuje hodnotu key uvedenu v metakonfiguracnom
+     * XML dokumente pri prislusnom elemente BTEConfiguration, resp. balik s
+     * anotaciou BTEConfiguration. Parameter anotacneho skenera sluzi na prekrytie
+     * predvoleneho skenera.
+     * @param key
+     */
+    public ConfigurationGatherer(String key, AnnotationScanner as) {
+        MetaConfigurationGatherer mcg = new MetaConfigurationGatherer();
+        this.metaConfigurationLoader = new BTEConfigurationLoader(key, mcg.getMetaconfiguration());
+        Set<String> annotations = new HashSet<String>();
+        annotations.addAll(metaConfigurationLoader.getConfigurationAnnotationsNames());
+        this.annotationScanner = as;
+        initialize();
+    }
 
     /**
      * Konstruktor. Parameter key predstavuje hodnotu key uvedenu v metakonfiguracnom
@@ -251,7 +267,17 @@ public class ConfigurationGatherer {
         
         // Citanie do jaxb
         try {
-            JAXBContext jc = JAXBContext.newInstance(metaConfigurationLoader.getJaxbPackage());
+            // Pri citani z anotacneho procesoru robilo somariny tak to skusam s classloadermi
+            JAXBContext jc;
+            try {
+                jc = JAXBContext.newInstance(metaConfigurationLoader.getJaxbPackage(), this.getClass().getClassLoader());                
+            } catch (Exception ex) {
+                try {
+                    jc = JAXBContext.newInstance(metaConfigurationLoader.getJaxbPackage(), Thread.currentThread().getContextClassLoader());
+                } catch (Exception ex2) {
+                    jc = JAXBContext.newInstance(metaConfigurationLoader.getJaxbPackage());                    
+                }
+            }
             Unmarshaller unmarshaller = jc.createUnmarshaller();
             jaxbConfiguration = (JAXBElement) unmarshaller.unmarshal(schema.getDocument());
         } catch (JAXBException ex) {

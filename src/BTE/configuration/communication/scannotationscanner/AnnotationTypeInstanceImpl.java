@@ -112,34 +112,42 @@ public class AnnotationTypeInstanceImpl implements AnnotationTypeInstance {
         this.annotation = annotation;
     }
 
+    @Override
     public Class getSourceClass() {
         return sourceClass;
     }
 
+    @Override
     public Method getSourceMethod() {
         return sourceMethod;
     }
 
+    @Override
     public Field getSourceField() {
         return sourceField;
     }
 
+    @Override
     public Constructor getSourceConstructor() {
         return sourceConstructor;
     }
 
+    @Override
     public int getParameterNumber() {
         return parameterNumber;
     }
 
+    @Override
     public ElementKind getJavaElementKind() {
         return javaElementKind;
     }
 
+    @Override
     public Annotation getAnnotation() {
         return annotation;
     }
 
+    @Override
     public Package getSourcePackage(){
         return sourcePackage;
     }
@@ -176,6 +184,7 @@ public class AnnotationTypeInstanceImpl implements AnnotationTypeInstance {
         }
     }
 
+    @Override
     public String getJavaElementCanonicalName() {
         switch(javaElementKind){
             case ANNOTATION_TYPE:

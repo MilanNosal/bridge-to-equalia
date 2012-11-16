@@ -18,30 +18,28 @@ import sk.tuke.fei.kpi.nosal.milan.bte.metaconfiguration.*;
 /**
  * Trieda pre nacitanie konfiguracie nastroja (teda metakonfiguracie)
  * prostrednictvom abstrakcie konfiguracie XML a anotacii.
+ *
  * @author Milan
  */
 public class BTEConfigurationLoader implements MetaConfigurationLoader {
+
     /**
      * Model metakonfiguracie v Java objektoch.
      */
     private BTEConfigurationType source;
-
     /**
      * Mnozina tried konfiguracnych anotacnych typov.
      */
     private List<Class> confAnnotations = new ArrayList<Class>();
-
     /**
      * Prud na vypis varovani.
      */
     private WarningPrinter warningPrinter;
-
     /**
      * Tabulka mapovania typov jazykovych elementov.
      */
     @SuppressWarnings("MapReplaceableByEnumMap")
     Map<ElementType, String[]> elementTypes = new HashMap<ElementType, String[]>();
-
     /**
      * Dlzka kluca, klucom je nazov balika, ktory je oznaceny metainformaciou
      * BTEConfiguration. Sluzi mi neskor na hladanie spravnej vlastnosti resp.
@@ -53,19 +51,21 @@ public class BTEConfigurationLoader implements MetaConfigurationLoader {
      * Konstruktor, ktory pre dany kluc vyberie z mct objektu podstrom
      * reprezentujuci konfiguraciu s danym klucom a nainicializuje potrebne
      * premenne.
+     *
      * @param key
-     * @param mct Tento parameter je vhodne ziskat pouzitim MetaConfigurationGatherer.
+     * @param mct Tento parameter je vhodne ziskat pouzitim
+     * MetaConfigurationGatherer.
      */
-    public BTEConfigurationLoader(String key, MetaconfigurationType mct){
-        for(BTEConfigurationType bteConfiguration : mct.getBTEConfiguration()){
+    public BTEConfigurationLoader(String key, MetaconfigurationType mct) {
+        for (BTEConfigurationType bteConfiguration : mct.getBTEConfiguration()) {
             String tempKey = bteConfiguration.getKey();
-            if(tempKey == null && key == null){
+            if (tempKey == null && key == null) {
                 source = bteConfiguration;
                 this.keyLength = 0;
                 init();
                 return;
             }
-            if(tempKey!=null && tempKey.equals(key)){
+            if (tempKey != null && tempKey.equals(key)) {
                 this.keyLength = key.length();
                 source = bteConfiguration;
                 init();
@@ -73,40 +73,45 @@ public class BTEConfigurationLoader implements MetaConfigurationLoader {
             }
         }
         throw new MetaConfigurationException("BTEMetaConfigurationLoader()::\n\tERROR: Cannot find "
-                + "configuration with key \""+key+"\".");
+                + "configuration with key \"" + key + "\".");
     }
 
     /**
      * Metoda inicializujuca clenske premenne.
      */
-    private void init(){
+    private void init() {
         // priprava vypisu chyb
         warningPrinter = new WarningPrinter(source.isWarningPrinting());
         // Nainicializovanie zoznamu tried
-        for(String clazz : source.getConfigurationAnnotations()){
+        for (String clazz : source.getConfigurationAnnotations()) {
             try {
-                confAnnotations.add(Class.forName(clazz.trim(), false, Thread.currentThread().getContextClassLoader()));
+                confAnnotations.add(Class.forName(clazz.trim()));
             } catch (ClassNotFoundException ex) {
                 try {
-                    confAnnotations.add(Class.forName(clazz.trim()));
+                    confAnnotations.add(Class.forName(clazz.trim(), false, Thread.currentThread().getContextClassLoader()));
                 } catch (ClassNotFoundException ex1) {
-                    warningPrinter.println("BTEMetaConfigurationLoader::\n\tWarning: Class \""+clazz+"\", you have determined " +
-                        "as configuration annotation type cannot be loaded.");
+                    try {
+                        confAnnotations.add(Class.forName(clazz.trim(), false, this.getClass().getClassLoader()));
+                    } catch (ClassNotFoundException ex2) {
+                        warningPrinter.println("BTEMetaConfigurationLoader::\n\tWarning: Class \"" + clazz + "\", you have determined "
+                                + "as configuration annotation type cannot be loaded.");
+                    }
                 }
             }
         }
+
         // priprava elementTypes
-        elementTypes.put(ElementType.ANNOTATION_TYPE, new String[] { source.getDocument().getElementKinds().getAnnotationType() });
-        elementTypes.put(ElementType.PACKAGE, new String[] { source.getDocument().getElementKinds().getPackage() });
-        elementTypes.put(ElementType.TYPE, new String[] {
-            source.getDocument().getElementKinds().getAnnotationType(),
-            source.getDocument().getElementKinds().getClazz(),
-            source.getDocument().getElementKinds().getInterface(),
-            source.getDocument().getElementKinds().getEnum()});
-        elementTypes.put(ElementType.FIELD, new String[] { source.getDocument().getElementKinds().getField() });
-        elementTypes.put(ElementType.METHOD, new String[] { source.getDocument().getElementKinds().getMethod() });
-        elementTypes.put(ElementType.PARAMETER, new String[] { source.getDocument().getElementKinds().getParameter() });
-        elementTypes.put(ElementType.CONSTRUCTOR, new String[] { source.getDocument().getElementKinds().getConstructor() });
+        elementTypes.put(ElementType.ANNOTATION_TYPE, new String[]{source.getDocument().getElementKinds().getAnnotationType()});
+        elementTypes.put(ElementType.PACKAGE, new String[]{source.getDocument().getElementKinds().getPackage()});
+        elementTypes.put(ElementType.TYPE, new String[]{
+                    source.getDocument().getElementKinds().getAnnotationType(),
+                    source.getDocument().getElementKinds().getClazz(),
+                    source.getDocument().getElementKinds().getInterface(),
+                    source.getDocument().getElementKinds().getEnum()});
+        elementTypes.put(ElementType.FIELD, new String[]{source.getDocument().getElementKinds().getField()});
+        elementTypes.put(ElementType.METHOD, new String[]{source.getDocument().getElementKinds().getMethod()});
+        elementTypes.put(ElementType.PARAMETER, new String[]{source.getDocument().getElementKinds().getParameter()});
+        elementTypes.put(ElementType.CONSTRUCTOR, new String[]{source.getDocument().getElementKinds().getConstructor()});
     }
 
     @Override
@@ -132,18 +137,18 @@ public class BTEConfigurationLoader implements MetaConfigurationLoader {
     @Override
     public List<InputStream> getDocuments() {
         // Vytvorime zoznam dokumentov
-        List<InputStream> documents =  new ArrayList<InputStream>();
-        for(InputDocumentsType idt : source.getInputDocuments()){
-            if(idt.isResource()){
+        List<InputStream> documents = new ArrayList<InputStream>();
+        for (InputDocumentsType idt : source.getInputDocuments()) {
+            if (idt.isResource()) {
                 // Ak ide o abstrakciu k zdrojom
                 documents.add(Thread.currentThread().getContextClassLoader().getResourceAsStream(idt.getLocation()));
             } else {
                 // inak skusame otvarat subor na citanie
                 try {
                     documents.add(new FileInputStream(idt.getLocation()));
-                } catch (FileNotFoundException ex){
+                } catch (FileNotFoundException ex) {
                     warningPrinter.println("BTEMetaConfigurationLoader.getDocuments()::\n\tWarning: "
-                            + "MetaconfigurationLoader cannot find source document \""+idt.getLocation()+"\".");
+                            + "MetaconfigurationLoader cannot find source document \"" + idt.getLocation() + "\".");
                 }
             }
         }
@@ -164,8 +169,9 @@ public class BTEConfigurationLoader implements MetaConfigurationLoader {
     public String[] getSourceElementTypesAsStrings(ElementType[] types) {
         Set<String> ret = new HashSet<String>();
         for (ElementType type : types) {
-            if(type==ElementType.LOCAL_VARIABLE)
+            if (type == ElementType.LOCAL_VARIABLE) {
                 continue;
+            }
             ret.addAll(Arrays.asList(elementTypes.get(type)));
         }
         return ret.toArray(new String[]{});
@@ -176,16 +182,16 @@ public class BTEConfigurationLoader implements MetaConfigurationLoader {
         // Hladame, ci mame k dispozicii nejake metakonfiguraciu k vlastnosti
         String method = Utilities.getMethodsCanonicalName(property.toGenericString(), property.getName());
         // Z nazvu orezeme balik
-        method = method.substring(keyLength+1);
+        method = method.substring(keyLength + 1);
         List<Object> list = new ArrayList<Object>();
-        for(AnnotationTypeType att: source.getAnnotationType()){
+        for (AnnotationTypeType att : source.getAnnotationType()) {
             // Najprv najdeme jej anotacny typ
-            if(method.startsWith(att.getAnnotation())){
+            if (method.startsWith(att.getAnnotation())) {
                 // A orezeme z nazvu metody aj ten
-                method = method.substring(att.getAnnotation().length()+1);
-                for(DeclMethodType dmt : att.getDeclMethod()){
+                method = method.substring(att.getAnnotation().length() + 1);
+                for (DeclMethodType dmt : att.getDeclMethod()) {
                     // A mozeme porovnavat zvysok nazvu s hodnotou
-                    if(method.equals(dmt.getMethod())){
+                    if (method.equals(dmt.getMethod())) {
                         list.addAll(dmt.getAttribute());
                         list.addAll(dmt.getInside());
                         list.addAll(dmt.getMapsTo());
@@ -207,10 +213,10 @@ public class BTEConfigurationLoader implements MetaConfigurationLoader {
         // Opat orezeme nazov balika, aby sa lahsie porovnavalo (ak kvoli
         // jednoznacnosti)
         String clazz = annType.getName();
-        clazz = clazz.substring(keyLength+1);
+        clazz = clazz.substring(keyLength + 1);
         List<Object> list = new ArrayList<Object>();
-        for(AnnotationTypeType att: source.getAnnotationType()){
-            if(clazz.equals(att.getAnnotation())){
+        for (AnnotationTypeType att : source.getAnnotationType()) {
+            if (clazz.equals(att.getAnnotation())) {
                 list.addAll(att.getInside());
                 list.addAll(att.getMapsTo());
                 list.addAll(att.getSkip());
@@ -224,8 +230,6 @@ public class BTEConfigurationLoader implements MetaConfigurationLoader {
         return list;
     }
 
-
-
     @Override
     public IPrintStream getWarningPrinter() {
         return warningPrinter;
@@ -233,9 +237,10 @@ public class BTEConfigurationLoader implements MetaConfigurationLoader {
 
     @Override
     public String getElementKind(ElementKind elementKind) {
-        if(elementKind==null)
+        if (elementKind == null) {
             return "";
-        switch(elementKind){
+        }
+        switch (elementKind) {
             case ANNOTATION_TYPE:
                 return source.getDocument().getElementKinds().getAnnotationType();
             case CLASS:
@@ -261,7 +266,7 @@ public class BTEConfigurationLoader implements MetaConfigurationLoader {
 
     @Override
     public Priority getPriority() {
-        return (source.getPriority() == PriorityType.ANNOTATIONS)?Priority.ANNOTATIONS:Priority.XML;
+        return (source.getPriority() == PriorityType.ANNOTATIONS) ? Priority.ANNOTATIONS : Priority.XML;
     }
 
     @Override
@@ -273,5 +278,4 @@ public class BTEConfigurationLoader implements MetaConfigurationLoader {
     public String getJaxbPackage() {
         return source.getJaxbPackage();
     }
-
 }
