@@ -1,0 +1,1 @@
+A tool for abstraction of two common configuration formats -- annotations and XML. The tool is written in Java and for Java. BTE is merely an experimental tool so far, and is under development.
